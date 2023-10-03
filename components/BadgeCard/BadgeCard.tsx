@@ -198,12 +198,14 @@ export function BadgeCard() {
             </Text>
           </Grid.Col>
           <Grid.Col span={8}>
-            <canvas
-              ref={canvasRef}
-              style={{ borderRadius: 10 }}
-              width={WIDTH}
-              height={HEIGHT}
-            />
+            <Center>
+              <canvas
+                ref={canvasRef}
+                style={{ borderRadius: 10 }}
+                width={WIDTH}
+                height={HEIGHT}
+              />
+            </Center>
             <Center>
               <div>
                 {" "}
@@ -239,7 +241,8 @@ export function BadgeCard() {
                     <Button
                       onClick={() => {
                         window.open(
-                          `mailto:${stringValue}?subject=Pushup challenge&body=I challenge you to do 10 pushups in a row. Let me know if you can do it.`,
+                          //https://pushupchallenge-gamma.vercel.app
+                          `mailto:${stringValue}?subject=Pushup challenge&body=I challenge you to do 10 pushups in a row. Let me know if you can do it. https://pushupchallenge-gamma.vercel.app`,
                           "_blank"
                         );
                       }}
