@@ -137,7 +137,7 @@ export function BadgeCard() {
     ctx.drawImage(results.image, 0, 0, width, height);
     if (pose && pose?.name === "nose" && pose?.score > 0.15) {
       const keypoints = results?.poses?.[0]?.keypoints;
-      const leftEye = keypoints?.find((item) => item.name === "left_eye");
+      const leftEye = keypoints?.find((item: any) => item.name === "left_eye");
 
       const x = pose.x;
       const y = pose.y;
@@ -221,7 +221,7 @@ export function BadgeCard() {
                   opened={count === 0}
                   withCloseButton
                   position={{ top: "25%", left: "25%" }}
-                  onClose={close}
+                  // onClose={close}
                   size="lg"
                   radius="md"
                 >
