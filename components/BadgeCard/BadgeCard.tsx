@@ -218,7 +218,7 @@ export function BadgeCard() {
                   />
                 )}
                 <Dialog
-                  opened={count === 0}
+                  opened={count === 10}
                   withCloseButton
                   position={{ top: "25%", left: "25%" }}
                   // onClose={close}
