@@ -26,7 +26,7 @@ import * as tf from "@tensorflow/tfjs-core";
 import * as tfBackend from "@tensorflow/tfjs-backend-webgl";
 import { use, useEffect, useRef, useState } from "react";
 const WIDTH = 640;
-const HEIGHT = 480;
+const HEIGHT = 360;
 const mockdata = {
   image:
     "https://images.unsplash.com/photo-1437719417032-8595fd9e9dc6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=600&q=80",
@@ -58,6 +58,38 @@ export function BadgeCard() {
 
   const audioRef = useRef<any>(null);
   const [count, handlers] = useCounter(0, { min: 0, max: 10 });
+  const [videoWidth, setVideoWidth] = useState<any>(null);
+  const [videoHeight, setVideoHeight] = useState<any>(null);
+
+  useEffect(() => {
+    if (webcamRef.current && webcamRef.current.video) {
+      // this gets current size but not of the camera
+      //const width = webcamRef.current.video.videoWidth;
+      //const height = webcamRef.current.video.videoHeight;
+      const width = webcamRef.current.video.clientWidth;
+      const height = webcamRef.current.video.clientHeight;
+      console.log("width");
+      console.log(width);
+      if (width > height) {
+        if (width > WIDTH) {
+          setVideoWidth(WIDTH);
+          setVideoHeight((height / width) * WIDTH);
+        } else {
+          setVideoWidth(width);
+          setVideoHeight(height);
+        }
+      } else {
+        if (height > HEIGHT) {
+          setVideoHeight(HEIGHT);
+          setVideoWidth((width / height) * HEIGHT);
+        } else {
+          setVideoWidth(width);
+          setVideoHeight(height);
+        }
+      }
+    }
+  }, [webcamRef]);
+
   let timeoutId: NodeJS.Timeout; // You can use any other type according to your setup
   useEffect(() => {
     if (pushup) {
@@ -80,7 +112,7 @@ export function BadgeCard() {
 
   useEffect(() => {
     if (shouldPlay && audioRef.current) {
-      audioRef?.current?.play();
+      // audioRef?.current?.play();
     }
   }, [shouldPlay]);
   useEffect(() => {
@@ -105,8 +137,8 @@ export function BadgeCard() {
             poses,
           });
         },
-        width: WIDTH,
-        height: HEIGHT,
+        width: videoWidth,
+        height: videoHeight,
       });
       camera.start();
       setCameraStarted(true);
@@ -143,14 +175,14 @@ export function BadgeCard() {
       const y = pose.y;
       let color = "#FF0000"; // Red color
 
-      if (y > HEIGHT * 0.75) {
+      if (y > videoHeight * 0.75) {
         setShouldPlay(true);
         setPushup(true);
         color = "#00FF00"; // Green color
         // Draw a green line at HEIGHT * 0.75
         ctx.beginPath();
-        ctx.moveTo(0, HEIGHT * 0.75);
-        ctx.lineTo(WIDTH, HEIGHT * 0.75);
+        ctx.moveTo(0, videoHeight * 0.75);
+        ctx.lineTo(videoWidth, videoHeight * 0.75);
         ctx.lineWidth = 2;
         ctx.strokeStyle = color;
         ctx.stroke();
@@ -159,8 +191,8 @@ export function BadgeCard() {
         setPushup(false);
         // Draw a red line at HEIGHT * 0.75
         ctx.beginPath();
-        ctx.moveTo(0, HEIGHT * 0.75);
-        ctx.lineTo(WIDTH, HEIGHT * 0.75);
+        ctx.moveTo(0, videoHeight * 0.75);
+        ctx.lineTo(videoWidth, videoHeight * 0.75);
         ctx.lineWidth = 2;
         ctx.strokeStyle = color;
         ctx.stroke();
@@ -199,12 +231,14 @@ export function BadgeCard() {
           </Grid.Col>
           <Grid.Col span={8}>
             <Center>
-              <canvas
-                ref={canvasRef}
-                style={{ borderRadius: 10 }}
-                width={WIDTH}
-                height={HEIGHT}
-              />
+              {videoWidth && (
+                <canvas
+                  ref={canvasRef}
+                  style={{ borderRadius: 10 }}
+                  width={videoWidth}
+                  height={videoHeight}
+                />
+              )}
             </Center>
             <Center>
               <div>
@@ -256,7 +290,7 @@ export function BadgeCard() {
           </Grid.Col>
           <Grid.Col span={2}>
             <Text fz="lg" fw={500}>
-              {pushup ? "Hold it..." : "Do a pushup"}
+              {pushup ? "Hold it..." : "Do a pushup"} {videoWidth}
             </Text>
           </Grid.Col>
         </Grid>
@@ -297,15 +331,19 @@ export function BadgeCard() {
       </Group>
       <Group mt="xs">
         <Webcam
-          style={{ visibility: "hidden" }}
           ref={webcamRef}
-          mirrored={true}
-          height={WIDTH}
-          width={HEIGHT}
+          forceScreenshotSourceSize
           videoConstraints={{
+            height: 360,
+            width: 640,
             facingMode: "user",
           }}
+          // style={{ visibility: "hidden" }}
+          height="360"
+          width="640"
+          mirrored={true}
         />
+
         <audio ref={audioRef}>
           <source
             src={
